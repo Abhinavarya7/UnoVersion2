@@ -107,25 +107,49 @@ io.on('connection', client => {
     }
     });
 
-    client.on('startGame', ()=>{
-        const roomsOfClient = Array.from(client.rooms);
+    client.on('startGame', () => {
 
-        console.log("roomsOfClient:", roomsOfClient); // 🔥 ADD THIS
+    const roomsOfClient = Array.from(client.rooms);
+    const roomID = roomsOfClient.find(room => room !== client.id);
 
-        const roomID = roomsOfClient.find(room => room !== client.id);
+    if (!roomID) {
+        console.log("Room not found");
+        return;
+    }
 
-        let players = distributeCards(cards, 4);
-        let lastPlayedCard = drawRandomCard();
+    // Get player names (excluding 'host')
+    const playerNames = Object.keys(rooms[roomID]).filter(name => name !== 'host');
 
-        if(roomID){
-            console.log("Emitting to:", roomID); // 🔥 ADD THIS
-            io.to(roomID).emit('gameStarted', {players:players, cards:cards, playerNames: Object.keys(rooms[roomID]).filter(p => p !== 'host'), lastPlayedCard:lastPlayedCard});
-        }
-        else {
-            console.log("not found");
-        }
+    // Distribute cards
+    let distributed = distributeCards([...cards], playerNames.length);
+
+    let playersCards = {}; // { socketId: [cards] }
+
+    playerNames.forEach((name, index) => {
+        const socketId = rooms[roomID][name];
+        playersCards[socketId] = distributed[index];
     });
 
+    let lastPlayedCard = drawRandomCard();
+
+    console.log("Emitting to:", roomID);
+
+    // 🔥 SEND DATA INDIVIDUALLY (IMPORTANT)
+    playerNames.forEach((name, index) => {
+        const socketId = rooms[roomID][name];
+
+        io.to(socketId).emit('gameStarted', {
+            yourCards: playersCards[socketId],
+            players: playerNames.map(n => ({
+                name: n,
+                count: playersCards[rooms[roomID][n]].length
+            })),
+            yourIndex: index,
+            lastPlayedCard: lastPlayedCard
+        });
+    });
+
+    });
 });
 
 
