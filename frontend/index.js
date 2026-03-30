@@ -7,6 +7,10 @@ const leaveButton = document.createElement('button');
 leaveButton.id = 'leaveRoom';
 leaveButton.textContent = 'Leave Room';
 const socket = io('http://localhost:3000');
+window.socket = socket;
+const startButton = document.createElement('button');
+startButton.id = 'startGame';
+startButton.textContent = 'Start Game';
 
 socket.on('connected', (msg)=>{console.log(msg)});
 
@@ -46,12 +50,18 @@ socket.on('createRoom', (data) => {
     // Append the player list to the pregame utilities section
     pregameUtilites.appendChild(playerListDiv);
     pregameUtilites.appendChild(leaveButton);
+    pregameUtilites.appendChild(startButton);
 });
 
 joinRoom.addEventListener('click', ()=>{
     let roomCode = prompt("Enter the Room code");
     playerName = prompt("Enter your name");
     socket.emit('joinRoom', {player: playerName, code: roomCode});
+})
+
+startButton.addEventListener('click', ()=>{
+    socket.emit('startGame');
+    console.log("start clicked");
 })
 
 // socket.on('joinRoom', (data) => {
@@ -103,6 +113,10 @@ socket.on('player_list_update', (data) => {
     // Append the player list to the pregame utilities section
     pregameUtilites.appendChild(playerListDiv);
     pregameUtilites.appendChild(leaveButton);
+
+    if(data.host===socket.id){
+        pregameUtilites.appendChild(startButton);
+    }
 });
 
 socket.on('disconnect', (reason) => {
