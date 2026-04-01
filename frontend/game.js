@@ -9,20 +9,14 @@ socket.on('gameStarted', (data) => {
     displayCards(
         data.yourCards,
         data.players,
-        data.yourIndex
+        data.yourIndex,
+        data.turn,
+        data.lastPlayedCard
     );
 
-    // Last played card
-    const cardsPlayedDiv = document.querySelector('.cards-played');
-    cardsPlayedDiv.innerHTML = `
-        <img src="CardsFront/${data.lastPlayedCard}.png" 
-        style="width: 40%; height: 80%;">
-    `;
-
-    console.log("displayed the cards");
 });
 
-function displayCards(yourCards, playersInfo, yourIndex) {
+function displayCards(yourCards, playersInfo, yourIndex, turn, lastPlayedCard) {
 
     const playerContainers = [
         document.querySelector('.player1'),
@@ -51,7 +45,7 @@ function displayCards(yourCards, playersInfo, yourIndex) {
                 img.style.width = '20%';
 
                 img.addEventListener('click', () => {
-                    onCardClick(card, index);
+                    onCardClick(card, index, turn);
                 });
 
                 container.appendChild(img);
@@ -82,4 +76,59 @@ function displayCards(yourCards, playersInfo, yourIndex) {
     });
 
     cardSourceContainer.appendChild(img);
+
+    // Last played card
+    const cardsPlayedDiv = document.querySelector('.cards-played');
+    cardsPlayedDiv.innerHTML = `
+        <img src="CardsFront/${lastPlayedCard}.png" 
+        style="width: 40%; height: 80%;">
+    `;
+
+    console.log("displayed the cards");
+    
 }
+
+
+function onCardClick(card, index){
+    socket.emit('playedCard', {card:card, index:index});
+}
+
+socket.on('game_state', (data) => {
+
+    let passButton = document.getElementById('passButton');
+    if(passButton) passButton.remove();
+    displayCards(
+        data.yourCards,
+        data.players,
+        data.yourIndex,
+        data.currentTurn,
+        data.currentCard
+    );
+});
+
+function onDrawCardClick(){
+    socket.emit('drawCard');
+}
+
+socket.on('drawn_state', (data) => {
+    displayCards(
+        data.yourCards,
+        data.players,
+        data.yourIndex,
+        data.currentTurn,
+        data.currentCard
+    );
+
+    let gameBox = document.getElementById('gameContainer');
+    let pass = document.createElement('button');
+    pass.id = 'passButton';
+    pass.textContent = 'Pass';
+
+    gameBox.appendChild(pass);
+
+    pass.addEventListener('click', ()=>{
+        socket.emit('passTurn');
+        pass.remove();
+    });
+});
+
