@@ -227,7 +227,7 @@ io.on('connection', client => {
                 for (let i = 0; i < 4; i++) {
                     nextPlayer.cards.push(drawRandomCard(game));
                 }
-                game.currentPlayerIndex=(game.currentPlayerIndex+game.direction+game.players.length)%game.players.length;
+                game.currentPlayerIndex=(game.currentPlayerIndex+game.direction*2+game.players.length)%game.players.length;
                 sendGameState(roomID);
             });
         }
