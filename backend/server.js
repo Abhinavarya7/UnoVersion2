@@ -131,13 +131,16 @@ io.on('connection', client => {
         let currentCard = null;
         let discardPile = [];
         let players = [];
+        let suitch=true;
+
         playerNames.forEach((name, index)=>{
             let id = rooms[roomID][name];
             let cards = distributed[index];
             players.push({id, name, cards: cards});
         });
+        
 
-        games[roomID] = {players, deck, discardPile, currentPlayerIndex, direction, currentColor, currentCard};
+        games[roomID] = {players, deck, discardPile, currentPlayerIndex, direction, currentColor, currentCard, suitch};
 
         playerNames.forEach((name, index) => {
             const socketId = rooms[roomID][name];
@@ -163,7 +166,8 @@ io.on('connection', client => {
                 })),
                 yourIndex: index,
                 lastPlayedCard: lastPlayedCard,
-                turn:0
+                turn:0,
+                suitch: games[roomID].suitch
             });
         });
 
@@ -171,6 +175,7 @@ io.on('connection', client => {
     });
 
     client.on('playedCard', (data) => {
+        console.log('Played card server me aaya');
         let card = data.card;
         let index = data.index;
 
@@ -187,12 +192,18 @@ io.on('connection', client => {
         if (!player.cards.includes(card)) return;
 
         // ❌ validity check
+        console.log('validity check kar rahe hain');
+        console.log('card hai: ', card, 'aur previous card hai: ', game.currentCard, 'aur prvious color hai: ', game.currentColor);
         let {valid, type} = validityAndType(card, game);
         if (!valid) return;
+        console.log('saari chizein valid hain');
+        game.suitch = true;
 
         if(type === 'colorChange'){
-            client.emit('chooseColor');
+            console.log('color change');
+            io.to(client.id).emit('chooseColor');
             client.once('colorChosen', (color) => {
+                console.log('Ye effect me aa raha hai: ', color);
                 game.currentColor = color;
                 game.currentCard = card;
                 game.discardPile.push(card);
@@ -203,8 +214,9 @@ io.on('connection', client => {
         }
 
         else if(type === 'wild'){
+            console.log('om namah shivay');
             client.emit('chooseColor');
-            client.once('wildColorChosen', (color) => {
+            client.once('colorChosen', (color) => {
                 game.currentColor = color;
                 game.currentCard = card;
                 game.discardPile.push(card);
@@ -264,6 +276,7 @@ io.on('connection', client => {
             sendGameState(roomID);
         }
 
+
     });
 
     client.on('drawCard', () => {
@@ -277,6 +290,7 @@ io.on('connection', client => {
 
         const drawnCard = drawRandomCard(game);
         player.cards.push(drawnCard);
+        game.suitch = false;
         senddrawnState(roomID, client.id);
     });
 
@@ -286,6 +300,7 @@ io.on('connection', client => {
         const game = games[roomID];
 
         game.currentPlayerIndex=(game.currentPlayerIndex+game.direction+game.players.length)%game.players.length;
+        game.suitch = true;
         sendGameState(roomID);
 
     });
@@ -305,6 +320,7 @@ let games = {
     direction: 1, // 1 = clockwise, -1 = reverse
     currentColor: null,
     currentCard: null,
+    suitch: true
   }
   */
 };
@@ -411,18 +427,18 @@ function drawRandomCard(game) {
 
 function validityAndType(card, game) {
     const currentCardColor = card[card.length-1];
-    const lastCardColor = game.currentCard[game.currentCard.length-1];
+    const lastCardColor = game.currentColor;
     const lastCardNumber = game.currentCard[0];
 
     if (card[0] === "W" && currentCardColor === "W") return {valid: true, type: 'colorChange'};
 
     if (card[0] === 'D' && currentCardColor === "W") return {valid: true, type: 'wild'};
 
-    if (card[0] === 's' && currentCardColor === lastCardColor) return {valid: true, type: 'skip'};
+    if ((card[0] === 's' && currentCardColor === lastCardColor) || (card[0] === 's' && lastCardNumber === 's')) return {valid: true, type: 'skip'};
     
-    if (card[0] === '_' && currentCardColor === lastCardColor) return {valid: true, type: 'reverse'};
+    if ((card[0] === '_' && currentCardColor === lastCardColor) || (card[0] === '_' && lastCardNumber === '_')) return {valid: true, type: 'reverse'};
 
-    if (card[0] === 'D' && currentCardColor === lastCardColor) return {valid: true, type: 'drawTwo'};
+    if ((card[0] === 'D' && currentCardColor === lastCardColor) || (card[0] === 'D' && lastCardNumber === 'D')) return {valid: true, type: 'drawTwo'};
 
     if (card[0] === lastCardNumber || currentCardColor === lastCardColor) return {valid: true, type: 'numberCard'};
 
@@ -457,7 +473,8 @@ function sendGameState(roomID){
             yourIndex: index,
             currentCard: game.currentCard,
             currentColor: game.currentColor,
-            currentTurn: game.currentPlayerIndex
+            currentTurn: game.currentPlayerIndex,
+            suitch: game.suitch
         });
     });
 }
@@ -476,7 +493,8 @@ function senddrawnState(roomID, socketId){
                 yourIndex: index,
                 currentCard: game.currentCard,
                 currentColor: game.currentColor,
-                currentTurn: game.currentPlayerIndex
+                currentTurn: game.currentPlayerIndex,
+                suitch: game.suitch
             });
         }
         else{
@@ -489,7 +507,8 @@ function senddrawnState(roomID, socketId){
                 yourIndex: index,
                 currentCard: game.currentCard,
                 currentColor: game.currentColor,
-                currentTurn: game.currentPlayerIndex
+                currentTurn: game.currentPlayerIndex,
+                suitch: game.suitch
             });
         }
     });
