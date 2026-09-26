@@ -3,126 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Cards</title>
-    <style>
-        .pregame-container{
-            text-align: center;
-        }
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            /*overflow: hidden; /* Prevent scrolling */
-            box-sizing: border-box;
-        }
-
-        * {
-            box-sizing: inherit;
-        }
-
-        .game-container {
-            display: none;
-            flex-wrap: wrap;
-            width: 100%;
-            height: 100%;
-            /* border: 5px solid black; */
-            box-sizing: border-box;
-            position: relative;
-        }
-
-        .player-card {
-            position: absolute;
-            display: inline-flex;
-            flex-wrap: wrap; /* Allow cards to wrap within the container */
-            align-items: center;
-            justify-content: center;
-            width: 30%; /* Adjust width dynamically based on content */
-            height: auto; /* Adjust height dynamically based on content */
-            padding: 10px; /* Add some padding for spacing */
-            border: 3px solid #333;
-            border-radius: 10px;
-            background-color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .player-card h2 {
-            width: 100%;
-            padding: 1%;
-            margin: 0;
-            text-align: center;
-        }
-
-        .player-card img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            position: static; /* Changed from absolute to static to allow stacking */
-        }
-
-        .player3 {
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .player4 {
-            top: 50%;
-            right: 0;
-            transform: translateY(-50%);
-        }
-
-        .player1 {
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .player2 {
-            top: 50%;
-            left: 0;
-            transform: translateY(-50%);
-        }
-
-        .center-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 30%;
-            height: 15%;
-        }
-
-        .center-card {
-            width: 45%;
-            height: 100%;
-            border: 3px solid #333;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .center-card h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: #333;
-        }
-    </style>
+    <title>UNO Arena</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="pregame-container" id="pregame-screen">
-        <div id="pregameUtilities">
-            <button id="createRoom">Create Room</button>
-            <button id="joinRoom">Join Room</button>
+        <div class="lobby-shell">
+            <div class="lobby-kicker">Multiplayer Card Table</div>
+            <h1>UNO Arena</h1>
+            <p>Build a room, bring your players in, and run a smooth live game with turn rules, UNO calls, wild challenges, and a proper table layout.</p>
+            <div id="pregameUtilities">
+                <div class="lobby-actions">
+                    <button id="createRoom">Create Room</button>
+                    <button id="joinRoom" class="action-button cool">Join Room</button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="game-container" id="game-screen">
+        <div class="table-surface"></div>
+        <div class="table-brand">UNO</div>
+        <div class="table-header">
+            <div class="status-copy">
+                <span class="status-eyebrow">Match Status</span>
+                <span class="status-headline" id="statusHeadline">Waiting for the first move</span>
+            </div>
+            <div class="room-chip" id="roomBadge">LIVE TABLE</div>
+        </div>
+        <div class="control-rail" id="controlRail"></div>
         <div class="player-card player1">
             <h2>Player 1</h2>
         </div>
@@ -144,7 +52,23 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js" integrity="sha384-kzavj5fiMwLKzzD1f8S7TeoVIEi7uKHvbTA3ueZkrzYq75pNQUiUi6Dy98Q3fxb0" crossorigin="anonymous"></script>
+    <div class="toast-stack" id="toastStack"></div>
+    <div class="victory-overlay" id="victoryOverlay">
+        <div class="confetti-layer" id="confettiLayer"></div>
+        <div class="victory-card">
+            <p class="victory-kicker">Round Complete</p>
+            <h2 class="victory-title">Winner</h2>
+            <p class="victory-name" id="victoryName">Player</p>
+            <p class="victory-copy">The table erupts and the cards reset for the next showdown.</p>
+        </div>
+    </div>
+    <div class="orientation-lock" id="orientationLock">
+        <div class="orientation-lock-card">
+            <h2>Rotate Device</h2>
+            <p>Gameplay is available only in landscape mode on phone screens. Rotate your device to continue the match.</p>
+        </div>
+    </div>
+    <script src="/vendor/socket.io.min.js"></script>
     <script src="index.js"></script>
     <script src="game.js"></script>
 </body>
