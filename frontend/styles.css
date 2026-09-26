@@ -349,6 +349,7 @@ button:focus-visible {
 }
 
 .player-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -356,14 +357,28 @@ button:focus-visible {
     width: max-content;
     max-width: 100%;
     min-width: 0;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
+    padding: 8px 10px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(8, 24, 34, 0.72), rgba(5, 20, 30, 0.48));
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(8px);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
     z-index: 2;
 }
 
+.player-card.current-turn {
+    border-color: rgba(255, 191, 26, 0.82);
+    background: linear-gradient(180deg, rgba(26, 49, 45, 0.9), rgba(7, 27, 34, 0.74));
+    box-shadow: 0 0 0 2px rgba(255, 191, 26, 0.12), 0 14px 34px rgba(0, 0, 0, 0.22);
+}
+
 .player-card h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 22px;
     margin: 0;
     width: 100%;
     text-align: center;
@@ -373,6 +388,7 @@ button:focus-visible {
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.94);
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.34);
+    white-space: nowrap;
 }
 
 .player-card.current-turn h2 {
@@ -387,6 +403,22 @@ button:focus-visible {
     max-width: 100%;
     padding: 0;
     overflow: visible;
+    min-width: 0;
+}
+
+.card-count {
+    padding: 3px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.68em;
+    letter-spacing: 0.02em;
+}
+
+.player-card.current-turn .card-count {
+    border-color: rgba(255, 191, 26, 0.35);
+    color: var(--gold);
 }
 
 .player-card img {
@@ -422,12 +454,93 @@ button:focus-visible {
     --seat-card-overlap: -18px;
     align-self: start;
     justify-self: center;
+    width: min(94vw, 780px);
     max-width: min(100%, 860px);
-    margin-top: -24px;
+    height: clamp(194px, 16vw, 210px);
+    min-height: 0;
+    padding: 9px 12px 10px;
+    margin-top: -28px;
+    overflow: hidden;
 }
 
 .player1 .cards-strip {
-    margin-inline: auto;
+    flex: 0 0 clamp(116px, 11vw, 146px);
+    height: clamp(116px, 11vw, 146px);
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    align-items: flex-end;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    padding: 8px 20px 4px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+}
+
+.player1 .cards-strip::-webkit-scrollbar {
+    height: 6px;
+}
+
+.player1 .cards-strip::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.hand-card {
+    position: relative;
+    flex: 0 0 auto;
+    width: var(--seat-card-width, clamp(64px, 6.2vw, 90px));
+    aspect-ratio: 5 / 7;
+    padding: 0;
+    margin: 0 0 0 var(--seat-card-overlap, clamp(-27px, -2vw, -18px));
+    overflow: visible;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    box-shadow: none;
+    transform: rotate(var(--card-angle, 0deg));
+    transform-origin: 50% 100%;
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.hand-card:first-child {
+    margin-left: 0;
+}
+
+.hand-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 9px;
+    filter: var(--card-shadow);
+}
+
+.hand-card:not(:disabled) {
+    cursor: pointer;
+}
+
+.hand-card:not(:disabled):hover,
+.hand-card:not(:disabled):focus-visible {
+    z-index: 20 !important;
+    transform: translateY(-13px) rotate(0deg) scale(1.08);
+    filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.42));
+}
+
+.hand-card:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.hand-card:disabled {
+    cursor: default;
+    filter: saturate(0.82);
+}
+
+.player1 .hand-card:disabled img {
+    opacity: 0.82;
 }
 
 .player2 {
@@ -447,6 +560,18 @@ button:focus-visible {
     margin-bottom: -12px;
 }
 
+.player3 .cards-strip {
+    flex: 0 0 clamp(82px, 8vw, 104px);
+    height: clamp(82px, 8vw, 104px);
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: flex-start;
+    overscroll-behavior-inline: contain;
+}
+
 .player4 {
     grid-area: right;
     --seat-card-width: clamp(42px, 4vw, 60px);
@@ -458,6 +583,39 @@ button:focus-visible {
 .player4 .cards-strip {
     flex-direction: column;
     align-items: center;
+    flex: 0 0 min(36vh, 270px);
+    height: min(36vh, 270px);
+    min-height: 0;
+    min-width: 0;
+    max-height: min(36vh, 270px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior-block: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
+}
+
+.player2,
+.player4 {
+    min-height: 0;
+    padding: 8px 7px;
+}
+
+.opponent-card {
+    width: var(--seat-card-width, clamp(38px, 4vw, 56px));
+    height: auto;
+    aspect-ratio: 5 / 7;
+    object-fit: contain;
+    border-radius: 6px;
+    filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.3));
+}
+
+.far-hand .opponent-card + .opponent-card {
+    margin-left: var(--seat-card-overlap, -12px);
+}
+
+.side-hand .opponent-card + .opponent-card {
+    margin-top: -23px;
 }
 
 .player2 img + img,
@@ -472,22 +630,30 @@ button:focus-visible {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: clamp(10px, 1vw, 14px);
+    gap: clamp(12px, 2vw, 24px);
     margin-top: -10px;
     z-index: 2;
 }
 
 .center-card {
+    position: relative;
     width: clamp(84px, 9.2vw, 114px);
     aspect-ratio: 5 / 7;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 18px;
-    border: 1px solid var(--line-strong);
-    background: linear-gradient(180deg, rgba(14, 30, 43, 0.98), rgba(9, 22, 34, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(145deg, rgba(15, 35, 46, 0.96), rgba(5, 21, 30, 0.98));
     box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
     overflow: hidden;
+}
+
+.cards-played.center-card {
+    overflow: visible;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
 }
 
 .center-card h3 {
@@ -500,15 +666,33 @@ button:focus-visible {
 
 .cards-played img,
 .center-card img {
-    width: 90%;
-    height: auto;
+    width: 88%;
+    height: 88%;
     object-fit: contain;
     filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.36));
+}
+
+.center-card.can-draw {
+    border-color: rgba(255, 191, 26, 0.68);
+    box-shadow: 0 0 0 3px rgba(255, 191, 26, 0.1), 0 18px 34px rgba(0, 0, 0, 0.32);
+    cursor: pointer;
+}
+
+.center-card.can-draw img {
+    transition: transform 0.18s ease;
+}
+
+.center-card.can-draw:hover img {
+    transform: translateY(-5px) rotate(-2deg);
 }
 
 .draw-pile-card,
 .discard-card {
     width: 90%;
+}
+
+.draw-pile-card {
+    cursor: inherit;
 }
 
 .your-card {
@@ -778,10 +962,20 @@ button:focus-visible {
     }
 
     .player1 {
+        width: min(96vw, 680px);
         --seat-card-width: clamp(50px, 6.8vw, 72px);
         --seat-card-overlap: -12px;
         max-width: min(100%, 640px);
         margin-top: -16px;
+    }
+
+    .player1 .cards-strip {
+        padding: 8px 16px 4px;
+    }
+
+    .hand-card {
+        width: var(--seat-card-width, clamp(50px, 6vw, 72px));
+        margin-left: var(--seat-card-overlap, -18px);
     }
 
     .player3 {
@@ -836,7 +1030,8 @@ button:focus-visible {
     }
 }
 
-@media (max-width: 900px) and (orientation: landscape) {
+@media (max-width: 900px) and (orientation: landscape),
+       (orientation: landscape) and (max-height: 500px) {
     html,
     body {
         min-height: 100%;
@@ -893,20 +1088,43 @@ button:focus-visible {
         font-size: 0.52rem;
     }
 
-    .player-card {
-        gap: 2px;
-    }
-
     .player-card h2 {
         font-size: 0.54rem;
         letter-spacing: 0.05em;
+        min-height: 16px;
+    }
+
+    .player-card {
+        gap: 2px;
+        padding: 4px 6px 5px;
+        border-radius: 11px;
+    }
+
+    .card-count {
+        padding: 2px 5px;
     }
 
     .player1 {
         --seat-card-width: clamp(30px, 4.1vw, 41px);
         --seat-card-overlap: -8px;
-        max-width: min(94vw, 390px);
-        margin-top: -34px;
+        width: min(90vw, 390px);
+        max-width: 94vw;
+        height: 94px;
+        padding: 4px 7px 5px;
+        margin-top: -30px;
+    }
+
+    .player1 .cards-strip {
+        max-width: calc(100vw - 28px);
+        flex-basis: 63px;
+        height: 63px;
+        padding: 2px 10px;
+    }
+
+    .hand-card {
+        width: clamp(31px, 5.7vh, 42px);
+        margin-left: -9px;
+        border-radius: 5px;
     }
 
     .player3 {
@@ -916,10 +1134,19 @@ button:focus-visible {
         margin-bottom: -20px;
     }
 
+    .player3 .cards-strip {
+        flex-basis: 62px;
+        height: 62px;
+    }
+
     .player2,
     .player4 {
         --seat-card-width: clamp(30px, 4.1vw, 41px);
         max-width: 62px;
+    }
+
+    .opponent-card {
+        width: clamp(27px, 5vh, 36px);
     }
 
     .player2 {
@@ -933,6 +1160,10 @@ button:focus-visible {
     .player2 img + img,
     .player4 img + img {
         margin-top: -18px;
+    }
+
+    .side-hand .opponent-card + .opponent-card {
+        margin-top: -15px;
     }
 
     .center-container {
@@ -978,93 +1209,6 @@ button:focus-visible {
     }
 }
 
-@media (max-width: 900px) and (orientation: landscape) and (max-height: 430px) {
-    .game-container.active {
-        min-height: calc(100svh + 18px);
-        grid-template-columns: minmax(46px, 58px) minmax(0, 1fr) minmax(46px, 58px);
-        padding: 4px 6px 14px;
-    }
-
-    .table-surface {
-        inset: 4px;
-    }
-
-    .table-surface::after {
-        inset: 18% 10% 9%;
-    }
-
-    .table-header {
-        width: min(384px, 100%);
-        padding: 4px 8px;
-    }
-
-    .status-eyebrow {
-        font-size: 0.42rem;
-    }
-
-    .status-headline {
-        font-size: 0.54rem;
-    }
-
-    .room-chip {
-        font-size: 0.48rem;
-        padding: 3px 6px;
-    }
-
-    .player-card h2 {
-        font-size: 0.48rem;
-    }
-
-    .player1 {
-        --seat-card-width: 26px;
-        --seat-card-overlap: -7px;
-        max-width: min(94vw, 320px);
-        margin-top: -38px;
-    }
-
-    .player3 {
-        --seat-card-width: 26px;
-        --seat-card-overlap: -7px;
-        max-width: min(84vw, 224px);
-        margin-bottom: -22px;
-    }
-
-    .player2,
-    .player4 {
-        --seat-card-width: 26px;
-        max-width: 54px;
-    }
-
-    .player2 img + img,
-    .player4 img + img {
-        margin-top: -15px;
-    }
-
-    .center-container {
-        gap: 5px;
-        margin-top: -18px;
-    }
-
-    .center-card {
-        --mobile-center-card-width: 5svh;
-        width: var(--mobile-center-card-width);
-        height: 10svh;
-        aspect-ratio: auto;
-        border-radius: 10px;
-    }
-
-    .cards-played img,
-    .center-card img {
-        width: 78%;
-        height: 78%;
-    }
-
-    .control-rail button {
-        min-width: 78px;
-        font-size: 0.5rem;
-        padding: 0.28rem 0.44rem;
-    }
-}
 
 @media (max-width: 620px) {
     .pregame-container {
@@ -1103,6 +1247,34 @@ button:focus-visible {
         text-align: center;
     }
 
+    .player-card h2 {
+        gap: 5px;
+        font-size: 0.6rem;
+    }
+
+    .player1 {
+        width: calc(100vw - 28px);
+    }
+
+    .player1 .cards-strip {
+        max-width: calc(100vw - 56px);
+        justify-content: flex-start;
+    }
+
+    .hand-card {
+        width: clamp(47px, 13vw, 64px);
+        margin-left: clamp(-19px, -4vw, -12px);
+    }
+
+    .player2,
+    .player4 {
+        max-width: 76px;
+    }
+
+    .opponent-card {
+        width: 34px;
+    }
+
     .room-chip {
         width: 100%;
         text-align: center;
@@ -1130,145 +1302,9 @@ button:focus-visible {
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
-    html,
-    body {
-        min-height: 100%;
-        overflow-x: hidden;
-        overflow-y: auto;
-    }
-
-    .game-container.active {
-        min-height: calc(100svh + 28px);
-        grid-template-columns: minmax(50px, 64px) minmax(0, 1fr) minmax(50px, 64px);
-        grid-template-rows: auto auto auto auto;
-        row-gap: 0;
-        column-gap: 4px;
-        padding: 6px 8px 18px;
-    }
-
-    .table-surface {
-        inset: 6px;
-        border-radius: 18px;
-    }
-
-    .table-surface::after {
-        inset: 17% 11% 10%;
-    }
-
-    .table-brand {
-        top: 55%;
-        font-size: clamp(1.35rem, 4.4vw, 2.25rem);
-    }
-
-    .table-header {
-        width: min(420px, 100%);
-        padding: 4px 10px;
-        border-radius: 12px;
-        gap: 8px;
-        margin-bottom: 2px;
-    }
-
-    .status-copy {
-        gap: 1px;
-    }
-
-    .status-eyebrow {
-        font-size: 0.46rem;
-    }
-
-    .status-headline {
-        font-size: 0.6rem;
-        line-height: 1.18;
-    }
-
-    .room-chip {
-        padding: 4px 7px;
-        font-size: 0.52rem;
-    }
-
-    .player-card {
-        gap: 2px;
-    }
-
-    .player-card h2 {
-        font-size: 0.54rem;
-        letter-spacing: 0.05em;
-    }
-
-    .player1 {
-        --seat-card-width: clamp(30px, 4.1vw, 41px);
-        --seat-card-overlap: -8px;
-        max-width: min(94vw, 390px);
-        margin-top: -34px;
-    }
-
-    .player3 {
-        --seat-card-width: clamp(30px, 4.1vw, 41px);
-        --seat-card-overlap: -8px;
-        max-width: min(86vw, 270px);
-        margin-bottom: -20px;
-    }
-
-    .player2,
-    .player4 {
-        --seat-card-width: clamp(30px, 4.1vw, 41px);
-        max-width: 62px;
-    }
-
-    .player2 {
-        margin-right: -12px;
-    }
-
-    .player4 {
-        margin-left: -12px;
-    }
-
-    .player2 img + img,
-    .player4 img + img {
-        margin-top: -18px;
-    }
-
-    .center-container {
-        gap: 6px;
-        margin-top: -16px;
-    }
-
-    .center-card {
-        --mobile-center-card-width: 5svh;
-        width: var(--mobile-center-card-width);
-        height: 10svh;
-        aspect-ratio: auto;
-        border-radius: 11px;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.24);
-    }
-
-    .cards-played img,
-    .center-card img {
-        width: 78%;
-        height: 78%;
-    }
-
-    .control-rail {
-        position: absolute;
-        right: 8px;
-        bottom: 8px;
-        width: auto;
-        justify-content: flex-end;
-        gap: 6px;
-    }
-
-    .control-rail button {
-        min-width: 86px;
-        flex: 0 1 auto;
-        padding: 0.34rem 0.56rem;
-        font-size: 0.56rem;
-    }
-
-    .game-modal {
-        width: min(320px, calc(100vw - 18px));
-        padding: 12px 10px;
-        border-radius: 16px;
-    }
+    .player3 h2 { margin-bottom: -26px; }
+    .player1 h2 { margin-bottom: -46px; }
+    .player1 { height: fit-content; min-height: 0; overflow: hidden; }
 }
 
 @media (orientation: landscape) and (max-height: 430px) {
@@ -1359,372 +1395,10 @@ button:focus-visible {
     }
 }
 
-/* Card table and hand layout */
-.player-card {
-    position: relative;
-    padding: 8px 10px 10px;
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 18px;
-    background: linear-gradient(180deg, rgba(8, 24, 34, 0.72), rgba(5, 20, 30, 0.48));
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(8px);
-    transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-}
-
-.player-card.current-turn {
-    border-color: rgba(255, 191, 26, 0.82);
-    background: linear-gradient(180deg, rgba(26, 49, 45, 0.9), rgba(7, 27, 34, 0.74));
-    box-shadow: 0 0 0 2px rgba(255, 191, 26, 0.12), 0 14px 34px rgba(0, 0, 0, 0.22);
-}
-
-.player-card h2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 22px;
-    white-space: nowrap;
-}
-
-.card-count {
-    padding: 3px 7px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.72);
-    font-size: 0.68em;
-    letter-spacing: 0.02em;
-}
-
-.player-card.current-turn .card-count {
-    border-color: rgba(255, 191, 26, 0.35);
-    color: var(--gold);
-}
-
-.cards-strip {
-    min-width: 0;
-}
-
-.player1 {
-    width: min(94vw, 780px);
-    padding: 9px 12px 10px;
-    margin-top: -28px;
-}
-
-.player1 .cards-strip {
-    width: 100%;
-    max-width: calc(100vw - 52px);
-    min-height: clamp(100px, 11vw, 136px);
-    justify-content: center;
-    align-items: flex-end;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 16px 20px 8px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
-}
-
-.hand-card {
-    position: relative;
-    flex: 0 0 auto;
-    width: var(--seat-card-width, clamp(64px, 6.2vw, 90px));
-    aspect-ratio: 5 / 7;
-    padding: 0;
-    margin: 0 0 0 var(--seat-card-overlap, clamp(-27px, -2vw, -18px));
-    overflow: visible;
-    border: 0;
-    border-radius: 9px;
-    background: transparent;
-    box-shadow: none;
-    transform: rotate(var(--card-angle, 0deg));
-    transform-origin: 50% 100%;
-    transition: transform 0.18s ease, filter 0.18s ease;
-}
-
-.hand-card:first-child {
-    margin-left: 0;
-}
-
-.hand-card img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 9px;
-    filter: var(--card-shadow);
-}
-
-.hand-card:not(:disabled) {
-    cursor: pointer;
-}
-
-.hand-card:not(:disabled):hover,
-.hand-card:not(:disabled):focus-visible {
-    z-index: 20 !important;
-    transform: translateY(-13px) rotate(0deg) scale(1.08);
-    filter: drop-shadow(0 16px 18px rgba(0, 0, 0, 0.42));
-}
-
-.hand-card:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 2px;
-}
-
-.hand-card:disabled {
-    cursor: default;
-    filter: saturate(0.82);
-}
-
-.player1 .hand-card:disabled img {
-    opacity: 0.82;
-}
-
-.player2,
-.player4 {
-    padding: 8px 7px;
-}
-
-.player2 .cards-strip,
-.player4 .cards-strip {
-    max-height: min(44vh, 330px);
-    overflow: hidden;
-}
-
-.opponent-card {
-    width: var(--seat-card-width, clamp(38px, 4vw, 56px));
-    height: auto;
-    aspect-ratio: 5 / 7;
-    object-fit: contain;
-    border-radius: 6px;
-    filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.3));
-}
-
-.far-hand .opponent-card + .opponent-card {
-    margin-left: var(--seat-card-overlap, -12px);
-}
-
-.side-hand .opponent-card + .opponent-card {
-    margin-top: -23px;
-}
-
-.center-container {
-    gap: clamp(12px, 2vw, 24px);
-}
-
-.center-card {
-    position: relative;
-    border-color: rgba(255, 255, 255, 0.22);
-    background: linear-gradient(145deg, rgba(15, 35, 46, 0.96), rgba(5, 21, 30, 0.98));
-}
-
-.cards-played.center-card {
-    overflow: visible;
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-}
-
-.cards-played img,
-.center-card img {
-    width: 88%;
-    height: 88%;
-    object-fit: contain;
-}
-
-.draw-pile-card {
-    cursor: inherit;
-}
-
-@media (max-width: 920px) {
-    .player1 {
-        width: min(96vw, 680px);
-        margin-top: -20px;
-    }
-
-    .player1 .cards-strip {
-        min-height: 94px;
-        padding: 14px 16px 7px;
-    }
-
-    .hand-card {
-        width: var(--seat-card-width, clamp(50px, 6vw, 72px));
-        margin-left: var(--seat-card-overlap, -18px);
-    }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-    .player1 {
-        width: min(90vw, 560px);
-        padding: 4px 7px 5px;
-        margin-top: -30px;
-    }
-
-    .player1 .cards-strip {
-        max-width: calc(100vw - 28px);
-        min-height: 66px;
-        padding: 9px 10px 4px;
-    }
-
-    .hand-card {
-        width: clamp(31px, 5.7vh, 42px);
-        margin-left: -9px;
-        border-radius: 5px;
-    }
-
-    .player-card {
-        padding: 4px 6px 5px;
-        border-radius: 11px;
-    }
-
-    .player-card h2 {
-        min-height: 16px;
-    }
-
-    .card-count {
-        padding: 2px 5px;
-    }
-
-    .opponent-card {
-        width: clamp(27px, 5vh, 36px);
-    }
-
-    .side-hand .opponent-card + .opponent-card {
-        margin-top: -15px;
-    }
-}
-
-@media (max-width: 620px) {
-    .player-card h2 {
-        gap: 5px;
-        font-size: 0.6rem;
-    }
-
-    .player1 {
-        width: calc(100vw - 28px);
-    }
-
-    .player1 .cards-strip {
-        max-width: calc(100vw - 56px);
-        justify-content: flex-start;
-    }
-
-    .hand-card {
-        width: clamp(47px, 13vw, 64px);
-        margin-left: clamp(-19px, -4vw, -12px);
-    }
-
-    .player2,
-    .player4 {
-        max-width: 76px;
-    }
-
-    .opponent-card {
-        width: 34px;
-    }
-}
-
-/* Keep each card tray a fixed size; extra cards scroll inside the tray. */
-.player1 {
-    height: clamp(194px, 16vw, 210px);
-    min-height: 0;
-    overflow: hidden;
-}
-
-.player1 .cards-strip {
-    flex: 0 0 clamp(116px, 11vw, 146px);
-    height: clamp(116px, 11vw, 146px);
-    min-height: 0;
-    min-width: 0;
-    width: 100%;
-    max-width: 100%;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-inline: contain;
-    padding-block: 8px 4px;
-}
-
-.player1 .cards-strip::-webkit-scrollbar {
-    height: 6px;
-}
-
-.player1 .cards-strip::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.28);
-}
-
-.player3 {
-    min-width: 0;
-    max-width: min(100%, 620px);
-}
-
-.player3 .cards-strip {
-    flex: 0 0 clamp(82px, 8vw, 104px);
-    height: clamp(82px, 8vw, 104px);
-    min-height: 0;
-    min-width: 0;
-    width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    justify-content: flex-start;
-    overscroll-behavior-inline: contain;
-}
-
-.player2,
-.player4 {
-    min-height: 0;
-}
-
-.player2 .cards-strip,
-.player4 .cards-strip {
-    flex: 0 0 min(36vh, 270px);
-    height: min(36vh, 270px);
-    min-height: 0;
-    min-width: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior-block: contain;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-    .player1 {
-        height: 94px;
-    }
-
-    .player1 .cards-strip {
-        flex-basis: 63px;
-        height: 63px;
-        padding-block: 2px;
-    }
-
-    .player3 .cards-strip {
-        flex-basis: 62px;
-        height: 62px;
-    }
-
-    .player2 .cards-strip,
-    .player4 .cards-strip {
-        flex-basis: min(34vh, 118px);
-        height: min(34vh, 118px);
-    }
-}
-
 @media (max-width: 620px) and (orientation: portrait) {
-    .player1 {
-        height: 150px;
-    }
-
-    .player1 .cards-strip {
-        flex-basis: 102px;
-        height: 102px;
-    }
-
-    .player3 .cards-strip {
-        flex-basis: 60px;
-        height: 60px;
-    }
-
+    .player1 { height: 150px; }
+    .player1 .cards-strip { flex-basis: 102px; height: 102px; }
+    .player3 .cards-strip { flex-basis: 60px; height: 60px; }
     .player2 .cards-strip,
     .player4 .cards-strip {
         flex-basis: min(30vh, 220px);
